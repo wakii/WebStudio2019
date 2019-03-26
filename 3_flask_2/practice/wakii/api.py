@@ -8,7 +8,16 @@ api = Api(app)
 
 class UserList(Resource) :
 	def get(self):
-		return 'get method'
+		if not os.path.exists('users.json'):
+			return 'users.json not exists'
+		with open('users.json','r') as fp :
+			r = json.loads(fp.read())
+		s = ''
+		for d in r :
+			email = d['email']
+			password = d['password']
+			s += '[email: {}, pw: {}]'.format(email,password)
+		return s
 
 	def post(self):
 		r_json = request.get_json()
