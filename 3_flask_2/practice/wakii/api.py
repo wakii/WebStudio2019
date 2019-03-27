@@ -42,10 +42,42 @@ class UserList(Resource) :
 # 마지막에 r 전체를 문서에 옮겨 씀.
 
 	def put(self):
-		return 'put method'
+		if not os.path.exists('users.json'):
+			return 'users.json not exists'
+		r_json = request.get_json()
+		email = r_json['email']
+		password = r_json['password']
+		r= []
+		with open('users.json', 'r') as fp:
+			r = json.loads(fp.read())
+		for d in r :
+			if email == d['email']:
+				d['password'] = password
+				break 
+		else : 
+			return 'Your Email accout {} is not here. You need to do POST  first'.format(email)		
+		with open('users.json', 'w') as fp:
+			fp.write(json.dumps(r))
+		return 'Your email {} got new password : {}'.format(email,password)
 
 	def delete(self):
-		return 'delete method'
+		if not os.path.exists('users.json'):
+			return 'There is no data you can DELETE'
+		r_json = request.get_json()
+		email = r_json['email']
+		r=[]	
+		with open('users.json', 'r') as fp:
+			r = json.loads(fp.read())
+		for d in r:
+			if email == d['email']:
+				r.remove(d)
+				break 
+		else :
+			return 'You don\'t have any email account {} what you want to DELETE in our database'.format(email)
+		with open('users.json', 'w') as fp:
+			fp.write(json.dumps(r))
+		return 'The email account {} has been TERMINATED.'.format(email)
+
 
 api.add_resource(UserList, '/api/users')
 
